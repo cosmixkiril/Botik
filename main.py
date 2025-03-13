@@ -1,17 +1,19 @@
 import os
 from flask import Flask, request
 import requests
+import openai
 
 app = Flask(__name__)
 
+# Переменные окружения
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 API_URL = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
 
-import openai
+# Ключ OpenAI
 openai.api_key = OPENAI_API_KEY
 
+# Обработка сообщений от Telegram (POST-запрос по webhook)
 @app.route(f"/{TELEGRAM_TOKEN}", methods=["POST"])
 def webhook():
     data = request.json
@@ -30,9 +32,11 @@ def webhook():
     else:
         answer = "Я понимаю только текст."
 
+    # Отправка ответа пользователю
     requests.post(API_URL, json={"chat_id": chat_id, "text": answer})
     return "ok"
 
+# Проверка запуска
 @app.route("/", methods=["GET"])
 def home():
     return "BotCosmixGpT is running!"
